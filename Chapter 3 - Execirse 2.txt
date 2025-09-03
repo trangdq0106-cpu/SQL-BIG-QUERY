@@ -1,0 +1,143 @@
+﻿WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT * 
+FROM taxi_trips_base
+ORDER BY trip_total DESC
+LIMIT 1000;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT DISTINCT company
+FROM taxi_trips_base
+ORDER BY company;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT DISTINCT payment_type
+FROM taxi_trips_base
+ORDER BY payment_type;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT ROUND(trip_seconds/60,2) AS trip_minutes, trip_total, company
+FROM taxi_trips_base
+ORDER BY trip_minutes DESC
+LIMIT 10;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT trip_miles, trip_total, company
+FROM taxi_trips_base
+ORDER BY trip_miles DESC
+LIMIT 10;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT trip_miles, trip_total, company
+FROM taxi_trips_base
+WHERE trip_total IS NOT NULL AND trip_total>0
+ORDER BY trip_total
+LIMIT 1;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT trip_miles, trip_total, company
+FROM taxi_trips_base
+WHERE trip_total IS NOT NULL AND trip_total>0
+ORDER BY trip_total DESC
+LIMIT 1;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT DISTINCT company
+FROM
+(
+  SELECT trip_miles, trip_total, company
+  FROM taxi_trips_base
+  ORDER BY trip_miles DESC
+  LIMIT 10
+);
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT trip_miles, trip_total, company
+FROM taxi_trips_base
+WHERE trip_total IS NOT NULL AND trip_total>0 AND trip_month=12
+ORDER BY trip_total DESC
+LIMIT 10;
+--
+WITH taxi_trips_base
+AS
+(
+  SELECT EXTRACT(MONTH FROM trip_start_timestamp) AS trip_month, 
+    trip_seconds, trip_miles, fare, tips, tolls, extras, trip_total,
+    payment_type, company
+  FROM `bigquery-public-data.chicago_taxi_trips.taxi_trips`
+  WHERE EXTRACT(YEAR FROM trip_start_timestamp)=2022
+)
+SELECT ROUND(SUM(trip_total),2) AS trip_total_sum
+FROM taxi_trips_base
+WHERE trip_total IS NOT NULL AND trip_total>0 AND trip_month=12;

@@ -1,0 +1,26 @@
+﻿SELECT e.EMPLOYEE_ID, e.FIRST_NAME, e.SALARY, e.DEPARTMENT_ID, d.DEPARTMENT_NAME
+FROM `project-ntdung-test.my_dataset.employees` e JOIN `project-ntdung-test.my_dataset.departments` d
+  ON e.DEPARTMENT_ID=d.DEPARTMENT_ID
+WHERE e.DEPARTMENT_ID=90
+ORDER BY e.SALARY DESC;
+--
+SELECT e.EMPLOYEE_ID, e.FIRST_NAME, e.SALARY, e.DEPARTMENT_ID, d.DEPARTMENT_NAME
+FROM `project-ntdung-test.my_dataset.employees` e JOIN `project-ntdung-test.my_dataset.departments` d
+  ON e.DEPARTMENT_ID=d.DEPARTMENT_ID
+ORDER BY e.SALARY DESC
+LIMIT 10;
+--
+SELECT d.DEPARTMENT_ID, d.DEPARTMENT_NAME, d.MANAGER_ID, CONCAT(e.FIRST_NAME, ', ' , e.LAST_NAME) AS mgr_name, e.SALARY
+FROM `project-ntdung-test.my_dataset.employees` e JOIN `project-ntdung-test.my_dataset.departments` d
+  ON e.EMPLOYEE_ID=d.MANAGER_ID;
+--
+SELECT e.EMPLOYEE_ID, e.FIRST_NAME, e.SALARY, e.DEPARTMENT_ID, d.DEPARTMENT_NAME, d.LOCATION_ID, l.STREET_ADDRESS
+FROM `project-ntdung-test.my_dataset.employees` e JOIN `project-ntdung-test.my_dataset.departments` d
+  ON e.DEPARTMENT_ID=d.DEPARTMENT_ID JOIN `project-ntdung-test.my_dataset.locations` l
+  ON l.LOCATION_ID=d.LOCATION_ID
+WHERE l.CITY='Toronto';
+--
+SELECT e.EMPLOYEE_ID, e.FIRST_NAME, e.SALARY, e.MANAGER_ID, m.FIRST_NAME AS mgr_name
+FROM `project-ntdung-test.my_dataset.employees` e JOIN `project-ntdung-test.my_dataset.employees` m
+  ON e.MANAGER_ID=m.EMPLOYEE_ID
+ORDER BY e.SALARY;

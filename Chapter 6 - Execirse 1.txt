@@ -1,0 +1,100 @@
+﻿SELECT COUNT(*) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`;
+--
+SELECT year, COUNT(*) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`
+WHERE year>=2017
+GROUP BY year;
+--
+SELECT COUNT(*) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`
+WHERE name IS NULL;
+--
+SELECT COUNT(DISTINCT name) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`;
+--
+SELECT year, gender, COUNT(DISTINCT name) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`
+WHERE year>=2017
+GROUP BY year, gender
+ORDER BY year, gender;
+--
+WITH q
+AS
+(
+  SELECT year, gender, COUNT(DISTINCT name) AS cnt
+  FROM `bigquery-public-data.usa_names.usa_1910_current`
+  WHERE year>=2017
+  GROUP BY year, gender
+)
+SELECT year, SUM(CASE WHEN gender='F' THEN cnt ELSE 0 END) AS female_cnt, SUM(CASE WHEN gender='M' THEN cnt ELSE 0 END) AS male_cnt
+FROM q
+GROUP BY year;
+--
+SELECT year,
+    COUNT(DISTINCT IF(gender='F', name, NULL)) AS female_cnt,
+    COUNT(DISTINCT IF(gender='M', name, NULL)) AS male_cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`
+WHERE year >= 2017
+GROUP BY year
+ORDER BY year;
+--
+SELECT state, COUNT(DISTINCT name) AS cnt
+FROM `bigquery-public-data.usa_names.usa_1910_current`
+WHERE year=2021
+GROUP BY state
+ORDER BY cnt DESC
+LIMIT 5;
+--
+WITH female_name
+AS
+(
+  SELECT name, SUM(number) AS number_sum, 'Female' AS sex
+  FROM `bigquery-public-data.usa_names.usa_1910_current`
+  WHERE year=2021 AND state='CA' AND gender='F'
+  GROUP BY name
+  ORDER BY number_sum DESC
+  LIMIT 5
+),
+male_name AS
+(
+  SELECT name, SUM(number) AS number_sum, 'Male'
+  FROM `bigquery-public-data.usa_names.usa_1910_current`
+  WHERE year=2021 AND state='CA' AND gender='M'
+  GROUP BY name
+  ORDER BY number_sum DESC
+  LIMIT 5
+)
+SELECT *
+FROM female_name
+UNION ALL
+SELECT *
+FROM male_name;
+--
+WITH female_name
+AS
+(
+  SELECT name
+  FROM `bigquery-public-data.usa_names.usa_1910_current`
+  WHERE gender='F' AND year=2021
+),
+male_name AS
+(
+  SELECT name
+  FROM `bigquery-public-data.usa_names.usa_1910_current`
+  WHERE gender='M' AND year=2021
+),
+name AS
+(
+  SELECT name
+  FROM female_name
+  INTERSECT DISTINCT
+  SELECT name
+  FROM male_name
+)
+SELECT n.name, SUM(c.number) AS number_sum
+FROM name n JOIN `bigquery-public-data.usa_names.usa_1910_current` c ON n.name=c.name
+WHERE c.year=2021
+GROUP BY n.name
+ORDER BY number_sum DESC
+LIMIT 10;

@@ -1,0 +1,33 @@
+﻿SELECT * 
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+ORDER BY year DESC
+LIMIT 1000;
+--
+SELECT DISTINCT state
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+ORDER BY state;
+--
+SELECT DISTINCT year
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+ORDER BY year DESC;
+--
+SELECT * 
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+WHERE state='CA' AND year=2021
+ORDER BY number DESC
+LIMIT 10;
+--
+SELECT year, gender, name, number
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+WHERE state='CA' AND name LIKE 'Aad%'
+ORDER BY year, gender;
+--
+SELECT AVG(number) AS number_avg
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+WHERE state='CA' AND year=2021; -- 55.40
+--
+SELECT name, gender, number
+FROM `bigquery-public-data.usa_names.usa_1910_current` 
+WHERE state='CA' AND year=2021 AND number<=55
+ORDER BY number DESC
+LIMIT 1000;

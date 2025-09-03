@@ -1,0 +1,141 @@
+﻿-- Viết truy vấn để liệt kê các đơn đặt hàng, có tính tổng tiền tích lũy (TotalCumSum) theo ngày đặt và tên sản phẩm
+SELECT SUM(Sale_Dollars) OVER(ORDER BY Id, ProductName) TotalCumSum,
+  OrderNumber, OrderDate, ProductName, Sale_Dollars
+FROM `sales.sales_tab`
+WHERE EXTRACT(YEAR FROM OrderDate)=2014 AND EXTRACT(MONTH FROM OrderDate)=1;
+
+
+-- Viết truy vấn để liệt kê các đơn đặt hàng trong tháng 1 năm 2014, có tính tổng tiền tích lũy theo Id và sắp tăng theo tên sản phẩm
+SELECT SUM(Sale_Dollars) OVER(PARTITION BY Id ORDER BY ProductName) TotalCumSum, Id,
+  OrderNumber, OrderDate, ProductName, Sale_Dollars
+FROM `sales.sales_tab`
+WHERE EXTRACT(YEAR FROM OrderDate)=2014 AND EXTRACT(MONTH FROM OrderDate)=1;
+
+
+-- Liệt kê các đơn đặt hàng trong năm 2014, có số tiền đặt nhỏ hơn số tiền đặt trung bình theo mỗi sản phẩm
+SELECT OrderNumber, ProductName, Sale_Dollars
+FROM `sales.sales_tab`
+WHERE EXTRACT(YEAR FROM OrderDate)=2014
+QUALIFY Sale_Dollars<AVG(Sale_Dollars) OVER(PARTITION BY ProductName)
+ORDER BY OrderNumber, ProductName;
+
+
+-- Trong năm 2014, cho biết các chi tiết đặt hàng có số tiền đặt lớn nhất theo mỗi sản phẩm. Sắp tăng theo tên sản phẩm
+SELECT OrderNumber, ProductName, Sale_Dollars
+FROM `sales.sales_tab`
+WHERE EXTRACT(YEAR FROM OrderDate)=2014
+QUALIFY Sale_Dollars=MAX(Sale_Dollars) OVER(PARTITION BY ProductName)
+ORDER BY ProductName;
+
+
+-- Trong năm 2014, cho biết 10 sản phẩm có tổng tiền đặt lớn nhất
+WITH q AS
+(
+  SELECT * EXCEPT(rk)
+  FROM
+  (
+    SELECT *, DENSE_RANK() OVER(ORDER BY Total DESC) AS rk
+    FROM
+    (
+      SELECT ProductName, SUM(Sale_Dollars) AS Total
+      FROM `sales.sales_tab`
+      WHERE EXTRACT(YEAR FROM OrderDate)=2014
+      GROUP BY ProductName
+    )
+  )
+  WHERE rk<=10
+)
+SELECT *
+FROM q
+ORDER BY Total DESC;
+
+
+-- Trong năm 2014, cho biết 10 đơn đặt hàng có tổng tiền đặt lớn nhất
+SELECT * EXCEPT(rk)
+FROM
+(
+  SELECT *, DENSE_RANK() OVER(ORDER BY Total DESC) AS rk
+  FROM
+  (
+    SELECT OrderNumber, OrderDate, FirstName, SUM(Sale_Dollars) AS Total
+    FROM `sales.sales_tab`
+    WHERE EXTRACT(YEAR FROM OrderDate)=2014
+    GROUP BY OrderNumber, OrderDate, FirstName
+  )
+)
+WHERE rk<=10
+ORDER BY Total DESC;
+
+
+-- Trong năm 2014, cho biết 10 khách hàng có tổng tiền đặt lớn nhất
+SELECT * EXCEPT(rk)
+FROM
+(
+  SELECT *, DENSE_RANK() OVER(ORDER BY Total DESC) AS rk
+  FROM
+  (
+    SELECT FirstName, City, Country, SUM(Sale_Dollars) AS Total, COUNT(DISTINCT OrderNumber) AS OrderCount
+    FROM `sales.sales_tab`
+    WHERE EXTRACT(YEAR FROM OrderDate)=2014
+    GROUP BY FirstName, City, Country
+  )
+)
+WHERE rk<=10
+ORDER BY Total DESC;
+
+
+-- Cho biết các đơn đặt hàng có tổng tiền đặt lớn nhất của các khách hàng ở câu trên
+WITH q1 AS
+(
+  SELECT * EXCEPT(rk)
+  FROM
+  (
+    SELECT *, DENSE_RANK() OVER(ORDER BY Total DESC) AS rk
+    FROM
+    (
+      SELECT FirstName, City, Country, SUM(Sale_Dollars) AS Total, COUNT(DISTINCT OrderNumber) AS OrderCount
+      FROM `sales.sales_tab`
+      WHERE EXTRACT(YEAR FROM OrderDate)=2014
+      GROUP BY FirstName, City, Country
+    )
+  )
+  WHERE rk<=10
+),
+q2 AS
+(
+  SELECT OrderNumber, FirstName, SUM(Sale_Dollars) AS Total
+  FROM `sales.sales_tab`
+  WHERE EXTRACT(YEAR FROM OrderDate)=2014 AND FirstName IN (SELECT FirstName FROM q1)
+  GROUP BY OrderNumber, FirstName
+)
+SELECT * EXCEPT(rk)
+FROM
+(
+  SELECT *, DENSE_RANK() OVER(PARTITION BY FirstName ORDER BY Total DESC) AS rk
+  FROM q2
+)
+WHERE rk=1
+ORDER BY FirstName;
+
+
+--
+WITH q AS
+(
+  SELECT * EXCEPT(rk)
+  FROM
+  (
+    SELECT *, DENSE_RANK() OVER(ORDER BY Total DESC) AS rk
+    FROM
+    (
+      SELECT FirstName, City, Country, SUM(Sale_Dollars) AS Total, COUNT(DISTINCT OrderNumber) AS OrderCount
+      FROM `sales.sales_tab`
+      WHERE EXTRACT(YEAR FROM OrderDate)=2014
+      GROUP BY FirstName, City, Country
+    )
+  )
+  WHERE rk<=10
+)
+SELECT Country, SUM(Total) AS Total_sum
+FROM q
+GROUP BY Country
+ORDER BY Country;

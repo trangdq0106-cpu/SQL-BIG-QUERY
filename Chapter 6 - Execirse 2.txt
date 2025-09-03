@@ -1,0 +1,100 @@
+﻿SELECT COUNT(*) AS cnt
+FROM `project-ntdung-2023-demo.my_dataset.athletes`;
+--
+SELECT COUNT(*) AS cnt, COUNT(nationality) AS nationality_cnt, 
+  COUNT(DISTINCT nationality) AS nationality_number
+FROM `project-ntdung-2023-demo.my_dataset.athletes`;
+--
+SELECT COUNT(*) AS cnt, COUNT(sport) AS sport_cnt, 
+  COUNT(DISTINCT sport) AS sport_number
+FROM `project-ntdung-2023-demo.my_dataset.athletes`;
+--
+SELECT DISTINCT sport
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+ORDER BY sport;
+--
+SELECT nationality, COUNT(*) AS cnt, COUNT(DISTINCT name) AS name_cnt
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY nationality
+ORDER BY name_cnt DESC;
+--
+SELECT sport, COUNT(*) AS cnt
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport
+ORDER BY cnt DESC;
+--
+SELECT nationality, SUM(total) AS total_sum
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY nationality
+ORDER BY total_sum DESC;
+--
+SELECT nationality
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY nationality
+HAVING SUM(total)=0
+ORDER BY nationality;
+--
+SELECT sport, SUM(total) AS total_sum
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport
+ORDER BY total_sum DESC;
+--
+SELECT sport, SUM(total) AS total_sum,
+  SUM(gold) AS gold_sum, SUM(silver) AS silver_sum, SUM(bronze) AS bronze_sum
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport
+ORDER BY total_sum DESC;
+--
+SELECT nationality, SUM(total) AS total_sum,
+  SUM(gold) AS gold_sum, SUM(silver) AS silver_sum, SUM(bronze) AS bronze_sum
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY nationality
+ORDER BY total_sum DESC;
+--
+SELECT nationality, sex, SUM(total) AS total_sum,
+  SUM(gold) AS gold_sum, SUM(silver) AS silver_sum, SUM(bronze) AS bronze_sum
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY nationality, sex
+HAVING gold_sum>0
+ORDER BY nationality, sex;
+--
+WITH q
+AS
+(
+  SELECT name, SUM(gold) AS gold_sum
+  FROM `project-ntdung-2023-demo.my_dataset.athletes`
+  GROUP BY name
+  ORDER BY gold_sum DESC
+  LIMIT 10
+)
+SELECT name, nationality, sport, gold
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+WHERE name IN (SELECT name FROM q)
+ORDER BY nationality, name;
+--
+SELECT sport, COUNT(*) AS cnt, COUNTIF(total=0) AS total_0_cnt, COUNTIF(total>0) AS total_cnt
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport;
+--
+SELECT MAX(height) AS height_max, AVG(height) AS height_avg, AVG(weight) AS weight_avg, MAX(weight) AS weight_max
+FROM `project-ntdung-2023-demo.my_dataset.athletes`;
+--
+SELECT sport, AVG(height) AS height_avg, AVG(weight) AS weight_avg
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+WHERE sport IN ('basketball', 'volleyball', 'rowing')
+GROUP BY sport;
+--
+SELECT CORR(height, weight) AS hw_corr
+FROM `project-ntdung-2023-demo.my_dataset.athletes`;
+--
+SELECT sport, CORR(height, weight) AS hw_corr
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport
+HAVING hw_corr<0.7
+ORDER BY hw_corr;
+--
+SELECT sport, CORR(height, weight) AS hw_corr
+FROM `project-ntdung-2023-demo.my_dataset.athletes`
+GROUP BY sport
+HAVING hw_corr>=0.7
+ORDER BY hw_corr DESC;

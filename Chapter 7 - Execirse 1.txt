@@ -1,0 +1,48 @@
+﻿CREATE OR REPLACE TABLE my_dataset.pets_and_toys
+AS
+  SELECT 
+    1 AS ID, 'Moon' AS Name, 9 AS Age, 'Dog' AS Animal, STRUCT('McFly' AS Name, 'Frisbee' AS Type) AS Toy
+  UNION ALL
+  SELECT 
+    2, 'Ripley', 7, 'Cat', STRUCT('FluFly', 'Feather')
+  UNION ALL  
+  SELECT 
+    3, 'Napoleon', 1, 'Fish', STRUCT('Eddy', 'Castle');
+--
+SELECT * FROM my_dataset.pets_and_toys;
+--
+SELECT Name AS Pet_Name, Toy.Name AS Toy_Name, Toy.Type AS Toy_Type
+FROM my_dataset.pets_and_toys;
+--
+CREATE OR REPLACE TABLE my_dataset.pets_and_toys_type
+AS
+  SELECT 
+      1 AS ID, 'Moon' AS Name, 9 AS Age, 'Dog' AS Animal, ['Frisbee','Bone','Rope'] AS Toys
+    UNION ALL
+    SELECT 
+      2, 'Ripley', 7, 'Cat', ['Feather','Ball']
+    UNION ALL  
+    SELECT 
+      3, 'Napoleon', 1, 'Fish', ['Castle'];
+--
+SELECT * FROM my_dataset.pets_and_toys_type;
+--
+SELECT Name AS Pet_Name, Toy_Type
+FROM my_dataset.pets_and_toys_type, UNNEST(Toys) AS Toy_Type;
+--
+CREATE OR REPLACE TABLE my_dataset.more_pets_and_toys
+AS
+  SELECT 
+      1 AS ID, 'Moon' AS Name, 9 AS Age, 'Dog' AS Animal, 
+      [STRUCT('McFly' AS Name, 'Frisbee' AS Type), STRUCT('Scully', 'Bone'), STRUCT('Pusheen', 'Rope')] AS Toys
+    UNION ALL
+    SELECT 
+      2, 'Ripley', 7, 'Cat', [STRUCT('Flufly', 'Feather'), STRUCT('Robert', 'Ball')]
+    UNION ALL  
+    SELECT 
+      3, 'Napoleon', 1, 'Fish', [STRUCT('Eddy', 'Castle')];
+--
+SELECT * FROM my_dataset.more_pets_and_toys;
+--
+SELECT m.Name, t.Name AS Toy_Name, t.Type AS Toy_Type
+FROM my_dataset.more_pets_and_toys m, UNNEST(Toys) AS t;

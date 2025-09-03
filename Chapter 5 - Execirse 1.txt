@@ -1,0 +1,22 @@
+﻿SELECT c.CountryName, m.Athlete, m.Sport, m.Gender, m.Medal
+FROM `project-ntdung-test.my_dataset.medals` m JOIN `project-ntdung-test.my_dataset.countries` c
+  ON m.CountryCode=c.CountryCode
+WHERE m.Year=2012
+ORDER BY m.Athlete;
+--
+SELECT c.CountryName, m.Athlete, m.Sport
+FROM `project-ntdung-test.my_dataset.medals` m JOIN `project-ntdung-test.my_dataset.countries` c
+  ON m.CountryCode=c.CountryCode
+WHERE m.Year=2012 AND m.Gender='Women' AND m.Medal='Gold'
+ORDER BY m.Athlete
+LIMIT 10;
+--
+
+
+SELECT m.CountryCode, c.CountryName, COUNT(*) AS gold_cnt
+FROM `project-ntdung-test.my_dataset.medals` m JOIN `project-ntdung-test.my_dataset.countries` c
+  ON m.CountryCode=c.CountryCode
+WHERE m.Year=2012 AND m.Medal='Gold'
+GROUP BY m.CountryCode, c.CountryName 
+ORDER BY gold_cnt DESC
+LIMIT 10;
